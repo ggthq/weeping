@@ -1,0 +1,11 @@
+{
+  "name": "weeping",
+  "sources": [
+    "src",
+    {
+       "dir": "examples",
+       "type": "dev"
+    }
+  ],
+  "generate-merlin" : true
+}
