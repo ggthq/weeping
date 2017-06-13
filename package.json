@@ -1,0 +1,22 @@
+{
+  "name": "weeping",
+  "version": "0.1.0",
+  "author": "hiroqn <hiroqn1008@gmail.com>",
+  "dependencies": {
+    "bs-platform": "^1.7.4"
+  },
+  "keywords": [
+    "bucklescript",
+    "json"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "repository": "https://github.com/GigantechHQ/weeping.git",
+  "scripts": {
+    "build": "bsb",
+    "build:all": "bsb -make-world",
+    "clean": "bsb -clean",
+    "clean:all": "bsb -clean-world",
+    "watch": "bsb -make-world -w"
+  }
+}
