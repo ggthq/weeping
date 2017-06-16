@@ -8,7 +8,7 @@ Functional JSON parsing library for BuckleScript inspired by [Argo](https://gith
 
 JSON
 
-```
+```json
 {
   "x": 6
 }
@@ -36,7 +36,7 @@ and
 
 JSON
 
-```
+```json
 {
   "x": {
     "y": "Hey"
@@ -58,18 +58,32 @@ let _ =
 
 `path ["x"; "y"] String` is syntax sugar `Object("x", Object("y", String))`
 
+### 3 record and Match
 
-(*
+JSON
 
-let t1 j = j <|| Bool
+```json
+{
+  "x": {
+    "key1": "Hello",
+    "key2": 5
+  }
+}
+```
 
-let t2 j = j <| prop "x" (Func(fun j -> j <|* (String, Int)))
+```OCaml
+type foo = {
+  str: string;
+  num: int;
+}
 
-let t3 j = j <| path ["x"; "y"] (Func(fun j -> j <|| String))
+let init_foo str num = {str;num;}
 
-let t4 j = j <| path ["ss"; "dd"; "ff"] Int
+let match_foo json = Some init_foo <*> (json <| prop "key1" String) <*> (json <| prop "key2" Int)
 
-let t5 j = Some init_foo <*> (j <| Int) <*> (j <| String)
-
-let () = let j = Js.Json.parseExn "{\"x\": 3}" in
-       ignore (Some print_int <*> (j <| prop "x" Int)) *)
+let _ =
+ let json = Js.Json.parseExn "{\"x\":{\"key1\":\"Hello\",\"key2\":5}}" in
+ match (json <| prop "x" (Match match_foo)) with
+ | Some {str; num} -> print_string str; print_int num; print_newline()
+ | None -> ()
+```
