@@ -1,5 +1,5 @@
 type _ kind =
-    Void : unit kind
+  | Null : unit kind
   | Bool : bool kind
   | Int : int kind
   | Float : float kind
@@ -19,9 +19,10 @@ module Operator :
     val ( <||? ) : Js.Json.t -> 'a kind -> 'a option list option
     val ( <|* ) : Js.Json.t -> 'a kind * 'b kind -> ('a * 'b) option
   end
-module Option :
+module OptionOperator :
   sig
     val ( >>= ) : 'a option -> ('a -> 'b option) -> 'b option
     val ( <$> ) : 'a option -> ('a -> 'b) -> 'b option
     val ( <*> ) : ('a -> 'b) option -> 'a option -> 'b option
+    val ( <!> ) : 'a option -> 'a option -> 'a option
   end

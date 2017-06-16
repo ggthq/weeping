@@ -1,52 +1,46 @@
 (* json type *)
 type _ kind =
-  | Void : unit kind
+  | Null : unit kind
   | Bool : bool kind
   | Int : int kind
   | Float : float kind
   | String : string kind
   | Object : string * 'a kind -> 'a kind
-  | Match: (Js.Json.t -> 'b option) -> 'b kind
+  | Match : (Js.Json.t -> 'b option) -> 'b kind
+
+let sequence_rev l = Some(List.fold_left (fun acc o -> match o with Some x -> x :: acc | None -> acc) [] l)
+
+let ( <$> ) a f = match a with
+  | Some x -> Some(f x)
+  | _ -> None
 
 let select (type a) (query: a kind) json : a option =
-  let rec prop json (query: a kind): a option = match query with
-    | Bool -> begin match Js.Json.reifyType json with
-        | (Js.Json.Boolean, b) -> Some (Js.to_bool b)
-        | _ -> None
-      end
-    | Int -> begin match Js.Json.reifyType json with
-        | (Js.Json.Number, n) -> Some (int_of_float n)
-        | _ -> None
-      end
-    | Float -> begin match Js.Json.reifyType json with
-        | (Js.Json.Number, n) -> Some n
-        | _ -> None
-      end
-    | String -> begin match Js.Json.reifyType json with
-        | (Js.Json.String, str) -> Some str
-        | _ -> None
-      end
+  let rec prop (query: a kind) json: a option = match query with
+    | Null -> Js.Json.decodeNull json <$> ignore
+    | Bool -> Js.Json.decodeBoolean json <$> Js.to_bool
+    | Int -> Js.Json.decodeNumber json <$> int_of_float
+    | Float -> Js.Json.decodeNumber json
+    | String -> Js.Json.decodeString json
     | Match f -> f json
-    | Object(key, q) -> begin match Js.Json.reifyType json with
-        | (Js.Json.Object, obj) -> begin match Js.Dict.get obj key with
-            | Some x -> prop x q
+    | Object(key, q) -> begin match Js.Json.decodeObject json with
+        | Some obj -> begin match Js.Dict.get obj key with
+            | Some x -> prop q x
             | _ -> None
           end
         | _ -> None
       end
-    | _ -> None
-  in prop json query
+  in prop query json
 
-let select_option_list (type a) (query: a kind) json: a option list option = match Js.Json.reifyType json with
-  | (Js.Json.Array, arr) -> Some(Array.to_list arr |> List.rev_map (select query) |> List.rev)
-  | _ -> None
+let select_option_list (type a) (query: a kind) json: a option list option =
+  match Js.Json.reifyType json with
+    | (Js.Json.Array, arr) -> Some(Array.to_list arr |> List.rev_map (select query) |> List.rev)
+    | _ -> None
 
 let select_list (type a) (query: a kind) json: a list option =
   match Js.Json.reifyType json with
-  | (Js.Json.Array, arr) -> Some(Array.to_list arr |>
-                                 List.rev_map (select query) |>
-                                 List.fold_left (fun acc -> function Some x -> x :: acc | None -> acc) [])
+  | (Js.Json.Array, arr) -> Array.to_list arr |> List.rev_map (select query) |> sequence_rev
   | _ -> None
+
 
 let select_tuple2 (type a) (type b) ((qa, qb): a kind * b kind) json: (a * b) option = match Js.Json.reifyType json with
   | (Js.Json.Array, arr) ->
@@ -71,17 +65,19 @@ module Operator = struct
   let ( <|* ) (type a) (type b) json ((qa, qb): a kind * b kind): (a * b) option = select_tuple2 (qa, qb) json
 end
 
-
-module Option = struct
+module OptionOperator = struct
   let ( >>= ) a f = match a with
     | Some x -> f x
     | _ -> None
 
-  let ( <$> ) a f = match a with
-    | Some x -> Some(f x)
-    | _ -> None
+  let ( <$> ) = ( <$> )
 
   let ( <*> ) af a = match (af, a) with
     | (Some f, Some x) -> Some(f x)
     | _ -> None
+
+  let (<!>) a b = match (a, b) with
+    | (Some _, _) -> a
+    | (None, Some _) -> b
+    | (_, _) -> None
 end
