@@ -79,5 +79,5 @@ module OptionOperator = struct
   let (<!>) a b = match (a, b) with
     | (Some _, _) -> a
     | (None, Some _) -> b
-    | (_, _) -> None
+    | _ -> None
 end
