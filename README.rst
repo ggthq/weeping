@@ -113,4 +113,14 @@ Example 2
   | Some {str; num} -> print_string str; print_int num; print_newline()
   | None -> ()
 
+Authors
+======
+@kdxu, @hiroqn
+
+License
+======
+This project is licensed under the MIT License - see the `LICENSE.md <./LICENSE.md>`_ file for details
+
+
+
 
