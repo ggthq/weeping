@@ -2,6 +2,11 @@
 weeping
 ======
 
+.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
+   :target: https://opensource.org/licenses/MIT
+   :alt: License: MIT
+
+
 The Functional JSON parsing library for BuckleScript inspired by `Argo <https://github.com/thoughtbot/Argo>`_
 
 How to use
