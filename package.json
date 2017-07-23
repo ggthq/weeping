@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "author": "hiroqn <hiroqn1008@gmail.com>",
   "dependencies": {
-    "bs-platform": "^1.7.4"
+    "bs-platform": "^1.8.1"
   },
   "keywords": [
     "bucklescript",
