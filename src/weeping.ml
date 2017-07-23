@@ -32,18 +32,29 @@ let select (type a) (query: a kind) json : a option =
   in prop query json
 
 let select_option_list (type a) (query: a kind) json: a option list option =
-  match Js.Json.reifyType json with
-    | (Js.Json.Array, arr) -> Some(Array.to_list arr |> List.rev_map (select query) |> List.rev)
+  match Js.Json.decodeArray json with
+    | Some arr -> Some(Array.to_list arr |> List.rev_map (select query) |> List.rev)
     | _ -> None
 
 let select_list (type a) (query: a kind) json: a list option =
-  match Js.Json.reifyType json with
-  | (Js.Json.Array, arr) -> Array.to_list arr |> List.rev_map (select query) |> sequence_rev
-  | _ -> None
+  match Js.Json.decodeArray json with
+    | Some arr -> Array.to_list arr |> List.rev_map (select query) |> sequence_rev
+    | _ -> None
 
+module StringMap = Map.Make(String)
 
-let select_tuple2 (type a) (type b) ((qa, qb): a kind * b kind) json: (a * b) option = match Js.Json.reifyType json with
-  | (Js.Json.Array, arr) ->
+let select_map (type a) (query: a kind) json: a StringMap.t option =
+  match Js.Json.decodeObject json with
+    | Some obj ->
+      let entries = Js.Dict.entries obj in
+      let accumulator m (key, o) = match select query o with
+        | Some x ->  StringMap.add key x m
+        | _ -> m in
+      Some(Js.Array.reduce accumulator StringMap.empty entries)
+    | _ -> None
+
+let select_tuple2 (type a) (type b) ((qa, qb): a kind * b kind) json: (a * b) option = match Js.Json.decodeArray json with
+  | Some arr ->
     if Array.length arr > 1 then begin match (select qa (Array.get arr 0), select qb (Array.get arr 1)) with
       | (Some a, Some b) -> Some(a, b)
       | _ -> None
