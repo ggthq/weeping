@@ -13,6 +13,7 @@
   "main": "index.js",
   "repository": "https://github.com/GigantechHQ/weeping.git",
   "scripts": {
+    "run-example": "bsb && node lib/js/examples/example.js",
     "build": "bsb",
     "build:all": "bsb -make-world",
     "clean": "bsb -clean",

@@ -4,32 +4,48 @@ open Weeping.OptionOperator
 
 (* example 1 *)
 
+let file = Node.Fs.readFileSync "./examples/test.json" `utf8
+let json = Js.Json.parseExn file
+
 let _ =
- let json = Js.Json.parseExn "{\"x\":6}" in
- match ( json <| prop "x" Int) with
- | Some n -> print_int n; print_newline()
- | None -> ()
+  match ( json <| prop "x" Int) with
+    | Some n -> print_int n; print_newline()
+    | None -> ()
 
 (* exapmle 2 *)
 let _ =
- let json = Js.Json.parseExn "{\"x\":{\"y\":\"Hey\"}}" in
- match (json <| path ["x"; "y"] String) with
- | Some str -> print_endline str
- | None -> ()
+  match (json <| path ["this"; "is"] String) with
+    | Some str -> print_endline str
+    | None -> ()
 
 (* example 3 *)
 
-type foo = {
-  str: string;
-  num: int;
+type user = {
+  name: string;
+  age: int;
 }
 
-let init_foo str num = {str;num;}
+let init_user name age = {name;age;}
 
-let match_foo json = Some init_foo <*> (json <| prop "key1" String) <*> (json <| prop "key2" Int)
+let match_user = Match(fun json ->
+  Some init_user <*>
+  (json <| prop "name" String) <*>
+  (json <| prop "age" Int))
+
+let show_user {name; age;} = print_string ("My name is " ^ name ^ ", ");
+  print_int age;
+  print_string " years old";
+  print_newline()
 
 let _ =
- let json = Js.Json.parseExn "{\"x\":{\"key1\":\"Hello\",\"key2\":5}}" in
- match (json <| prop "x" (Match match_foo)) with
- | Some {str; num} -> print_string str; print_int num; print_newline()
- | None -> ()
+  match (json <| prop "me" match_user) with
+    | Some user -> show_user user
+    | None -> ()
+
+(* example 4 *)
+let match_users = Match(select_list match_user)
+
+let _ =
+  match (json <| prop "friends" match_users) with
+    | Some users -> users |> List.iter show_user
+    | None -> ()
