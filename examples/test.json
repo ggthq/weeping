@@ -15,5 +15,18 @@
       "name": "OCaml",
       "age": 21
     }
-  ]
+  ],
+  "root": {
+    "left": {
+      "left": 3,
+      "right": {
+        "left": 13,
+        "right": 9
+      }
+    },
+    "right": {
+      "left": 8,
+      "right": 2
+    }
+  }
 }

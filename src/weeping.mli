@@ -54,10 +54,18 @@ module Operator :
     val ( <|* ) : Js.Json.t -> 'a kind * 'b kind -> ('a * 'b) option
   end
 
+type 'a parser = Js.Json.t -> 'a option
+
+module ParserOperator : sig
+  val ( <$$> ) : ('a -> 'b) -> 'a parser -> 'b parser
+  val ( <**> ) : ('a -> 'b) parser -> 'a parser -> 'b parser
+  val ( <!!> ) : 'a parser -> 'a parser -> 'a parser
+end
+
 module OptionOperator :
   sig
     val ( >>= ) : 'a option -> ('a -> 'b option) -> 'b option
-    val ( <$> ) : 'a option -> ('a -> 'b) -> 'b option
+    val ( <$> ) : ('a -> 'b) -> 'a option -> 'b option
     val ( <*> ) : ('a -> 'b) option -> 'a option -> 'b option
     val ( <!> ) : 'a option -> 'a option -> 'a option
   end
