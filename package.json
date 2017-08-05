@@ -10,7 +10,7 @@
     "json"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/js/src/weeping.js",
   "repository": "https://github.com/GigantechHQ/weeping.git",
   "scripts": {
     "run-example": "bsb && node lib/js/examples/example.js",

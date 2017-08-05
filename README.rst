@@ -12,16 +12,23 @@ The Functional JSON parsing library for BuckleScript inspired by `Argo <https://
 How to use
 ======
 
-1 Getting number
-------
-
 * JSON
 
 .. code-block:: JSON
 
   {
-    "x": 6
+    "x": 4,
+    "this": {
+      "is": "i am string"
+    },
+    "me": {
+      "name": "hiroqn",
+      "age": 27
+    }
   }
+
+1 Getting number
+-----------------
 
 
 Example 1
@@ -37,7 +44,7 @@ Example 1
    | Some n -> print_int n
    | None -> ()
 
-..note::
+.. note::
 
   `( <| )` is function type is`Js.Json.t -> 'a kind -> 'a option`
 
@@ -120,7 +127,3 @@ Authors
 License
 ======
 This project is licensed under the MIT License - see the `LICENSE.md <./LICENSE>`_ file for details
-
-
-
-
