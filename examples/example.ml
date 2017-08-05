@@ -80,14 +80,20 @@ let _ =
 
 (* example 6 parser operator *)
 
-let rec match_tree2 =
+(* let rec match_tree23 =
+  let leaf = init_leaf <$$> select Int in
+  Match(leaf <!!> (init_tree
+    <$$> select (prop "right" match_tree23)
+    <**> select (prop "left" match_tree23))) *)
+
+let rec decode_tree json =
   let leaf = init_leaf <$$> select Int in
   let tree = init_tree
-    <$$> select (prop "right" match_tree2)
-    <**> select (prop "left" match_tree2) in
-  Match(leaf <!!> tree)
+    <$$> select (prop "right" (Match decode_tree))
+    <**> select (prop "left" (Match decode_tree)) in
+  (leaf <!!> tree) json
 
 let _ =
-  match (json <| prop "root" match_tree2) with
+  match (json <| prop "root" (Match decode_tree)) with
     | Some tree -> show_tree tree print_int
     | None -> print_string "Not match"
