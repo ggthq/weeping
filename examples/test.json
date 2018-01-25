@@ -1,0 +1,19 @@
+{
+  "x": 4,
+  "this": {
+    "is": "i am string"
+  },
+  "me": {
+    "name": "hiroqn",
+    "age": 27
+  },
+  "friends": [
+    {
+      "name": "kdxu",
+      "age": 25
+    },{
+      "name": "OCaml",
+      "age": 21
+    }
+  ]
+}
