@@ -25,7 +25,5 @@ lib/bs
 
 node_modules
 .merlin
-
-lib/js/src/weeping.js
-
-lib/js/examples/example.js
+lib
+src/*.js

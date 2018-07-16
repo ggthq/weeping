@@ -1,21 +1,19 @@
 open Weeping
-open Weeping.Operator
-open Weeping.OptionOperator
-open Weeping.ParserOperator
-
+open Weeping.SelectorOperator
+open Weeping.DecoderOperator
 (* example 1 *)
 
 let file = Node.Fs.readFileSync "./examples/test.json" `utf8
 let json = Js.Json.parseExn file
 
 let _ =
-  match ( json <| prop "x" Int) with
+  match (json <| prop_kind "x" Int) with
     | Some n -> print_int n; print_newline()
     | None -> ()
 
 (* exapmle 2 *)
 let _ =
-  match (json <| path ["this"; "is"] String) with
+  match (json <| path_kind ["this"; "is"] String) with
     | Some str -> print_endline str
     | None -> ()
 
@@ -28,10 +26,7 @@ type user = {
 
 let init_user name age = {name;age;}
 
-let match_user = Match(fun json ->
-  Some init_user <*>
-  (json <| prop "name" String) <*>
-  (json <| prop "age" Int))
+let user_kind = Decode(init_user <$> (prop "name" String) <*> (prop "age" Int))
 
 let show_user {name; age;} = print_string ("My name is " ^ name ^ ", ");
   print_int age;
@@ -39,15 +34,15 @@ let show_user {name; age;} = print_string ("My name is " ^ name ^ ", ");
   print_newline()
 
 let _ =
-  match (json <| prop "me" match_user) with
+  match (json <| (prop_kind "me" user_kind)) with
     | Some user -> show_user user
     | None -> ()
 
 (* example 4 list *)
-let match_users = Match(select_list match_user)
+let users_kind = listify user_kind
 
 let _ =
-  match (json <| prop "friends" match_users) with
+  match (json <| prop_kind "friends" users_kind) with
     | Some users -> users |> List.iter show_user
     | None -> ()
 
@@ -66,15 +61,23 @@ let rec show_tree tree show = match tree with
     show_tree l (fun a -> print_string "  "; show a; print_newline());
     show_tree r (fun a -> print_string "  "; show a; print_newline())
 
-let rec match_tree =
-  let leaf json = init_leaf <$> (json <| Int) in
-  let tree json = Some init_tree
-    <*> (json <| prop "right" match_tree)
-    <*> (json <| prop "left" match_tree) in
-  Match(fun json -> (leaf json) <!> (tree json))
+let rec fix f x = f (fix f) x
+
+let rec tree_kind =
+  let leaf = init_leaf <$> (select Int) in
+  let tree json = (init_tree
+                  <$> (prop "right" tree_kind)
+                  <*> (prop "left" tree_kind)) json in
+  Decode(fun json -> (leaf <|> tree) json)
+
+
+(* let rec tree_kind =
+  let leaf_decoder = init_leaf <$> (select Int) in
+  let tree_decoder = init_tree <$> (prop "right" tree_kind) <*> (prop "left" tree_kind) in
+  Decode(leaf_decoder <|> tree_decoder) *)
 
 let _ =
-  match (json <| prop "root" match_tree) with
+  match (json <| prop_kind "root" tree_kind) with
     | Some tree -> show_tree tree print_int
     | None -> print_string "Not match"
 
@@ -85,7 +88,7 @@ let _ =
   Match(leaf <!!> (init_tree
     <$$> select (prop "right" match_tree23)
     <**> select (prop "left" match_tree23))) *)
-
+(*
 let rec decode_tree json =
   let leaf = init_leaf <$$> select Int in
   let tree = init_tree
@@ -96,4 +99,4 @@ let rec decode_tree json =
 let _ =
   match (json <| prop "root" (Match decode_tree)) with
     | Some tree -> show_tree tree print_int
-    | None -> print_string "Not match"
+    | None -> print_string "Not match" *)
