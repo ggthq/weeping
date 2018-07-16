@@ -2,7 +2,9 @@
   "name": "weeping",
   "version": "0.1.0",
   "author": "hiroqn <hiroqn1008@gmail.com>",
-  "dependencies": {},
+  "dependencies": {
+    "bs-platform": "^4.0.0"
+  },
   "keywords": [
     "bucklescript",
     "json"
@@ -18,7 +20,5 @@
     "clean:all": "bsb -clean-world",
     "watch": "bsb -make-world -w"
   },
-  "devDependencies": {
-    "bs-platform": "^2.1.0"
-  }
+  "devDependencies": {}
 }

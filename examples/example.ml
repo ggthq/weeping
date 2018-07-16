@@ -13,7 +13,7 @@ let _ =
 
 (* exapmle 2 *)
 let _ =
-  match (json <| path_kind ["this"; "is"] String) with
+  match (json <| path_kind ["this"; "is"] Str) with
     | Some str -> print_endline str
     | None -> ()
 
@@ -26,7 +26,7 @@ type user = {
 
 let init_user name age = {name;age;}
 
-let user_kind = Decode(init_user <$> (prop "name" String) <*> (prop "age" Int))
+let user_kind = Decode(init_user <$> (prop "name" Str) <*> (prop "age" Int))
 
 let show_user {name; age;} = print_string ("My name is " ^ name ^ ", ");
   print_int age;

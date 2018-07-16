@@ -52,35 +52,35 @@ let listify kind = Decode(fun json ->
     | _ -> None)
 
 let list_kind decoder = Decode(fun json ->
-  match Js.Json.decodeArray json with
+    match Js.Json.decodeArray json with
     | Some arr -> Some(Array.to_list arr |>
-       List.rev_map decoder |>
-       List.fold_left (fun acc o -> match o with Some x -> x :: acc | None -> acc) [])
+                       List.rev_map decoder |>
+                       List.fold_left (fun acc o -> match o with Some x -> x :: acc | None -> acc) [])
     | _ -> None)
 
 let select_option_list (type a) (query: a kind) json: a option list option =
   match Js.Json.decodeArray json with
-    | Some arr -> Some(Array.to_list arr |> List.rev_map (select query) |> List.rev)
-    | _ -> None
+  | Some arr -> Some(Array.to_list arr |> List.rev_map (select query) |> List.rev)
+  | _ -> None
 
 let select_list (type a) (query: a kind) json: a list option =
   match Js.Json.decodeArray json with
-    | Some arr -> Some(Array.to_list arr |>
-      List.rev_map (select query) |>
-      List.fold_left (fun acc o -> match o with Some x -> x :: acc | None -> acc) [])
-    | _ -> None
+  | Some arr -> Some(Array.to_list arr |>
+                     List.rev_map (select query) |>
+                     List.fold_left (fun acc o -> match o with Some x -> x :: acc | None -> acc) [])
+  | _ -> None
 
 module StringMap = Map.Make(String)
 
 let select_map (type a) (query: a kind) json: a StringMap.t option =
   match Js.Json.decodeObject json with
-    | Some obj ->
-      let entries = Js.Dict.entries obj in
-      let accumulator m (key, o) = match select query o with
-        | Some x ->  StringMap.add key x m
-        | _ -> m in
-      Some(Js.Array.reduce accumulator StringMap.empty entries)
-    | _ -> None
+  | Some obj ->
+    let entries = Js.Dict.entries obj in
+    let accumulator m (key, o) = match select query o with
+      | Some x ->  StringMap.add key x m
+      | _ -> m in
+    Some(Js.Array.reduce accumulator StringMap.empty entries)
+  | _ -> None
 
 let select_tuple2 (qa, qb) json = match Js.Json.decodeArray json with
   | Some arr ->
