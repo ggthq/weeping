@@ -17,7 +17,7 @@ let ( <$> ) a f = match a with
 let select (type a) (query: a kind) json : a option =
   let rec prop (query: a kind) json: a option = match query with
     | Null -> Js.Json.decodeNull json <$> ignore
-    | Bool -> Js.Json.decodeBoolean json <$> Js.to_bool
+    | Bool -> Js.Json.decodeBoolean json
     | Int -> Js.Json.decodeNumber json <$> int_of_float
     | Float -> Js.Json.decodeNumber json
     | String -> Js.Json.decodeString json
